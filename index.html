@@ -458,6 +458,15 @@
             return emojiPool[Math.floor(Math.random() * emojiPool.length)];
         }
 
+        // Fisher-Yates shuffle
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
         function updateRange() {
             if (currentLevel === "1-10") { currentMin = 1; currentMax = 10; }
             else if (currentLevel === "11-20") { currentMin = 11; currentMax = 20; }
@@ -483,7 +492,7 @@
             }
         }
 
-        // generate number buttons in two rows
+        // generate number buttons in two rows — with RANDOMIZED order
         function renderChoices() {
             numberChoicesContainer.innerHTML = "";
             
@@ -491,6 +500,9 @@
             for (let n = currentMin; n <= currentMax; n++) {
                 numbers.push(n);
             }
+            
+            // 🔀 Shuffle the numbers so options appear in random order
+            shuffleArray(numbers);
             
             const mid = Math.ceil(numbers.length / 2);
             const firstRow = numbers.slice(0, mid);
@@ -604,11 +616,12 @@
             emojiGrid.style.background = "";
         }
 
-        // Load next object (auto-advance after correct)
+        // Load next object (auto-advance after correct) — also reshuffles options
         function loadNextObject() {
             currentNumber = randomNumber();
             currentEmoji = randomEmoji();
             renderEmojis();
+            renderChoices();   // 🔀 reshuffle options each round
             resetAnsweredState();
         }
 
@@ -619,6 +632,7 @@
             currentNumber = randomNumber();
             currentEmoji = randomEmoji();
             renderEmojis();
+            renderChoices();   // 🔀 reshuffle on reset too
             resetAnsweredState();
             popupOverlay.classList.remove("active");
         }
