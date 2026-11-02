@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🔵 count · emojis 🔴</title>
+    <!-- Farsan Font for numbers only -->
+    <link href="https://fonts.googleapis.com/css2?family=Farsan&display=swap" rel="stylesheet">
+    <!-- Quicksand for everything else -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* reset + blue/red theme */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #eef4fc;
+            font-family: 'Quicksand', 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 14px;
+            color: #1a2639;
+            font-weight: 600;
+        }
+
+        .game-box {
+            max-width: 680px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 56px;
+            padding: 28px 22px 32px;
+            box-shadow: 0 12px 32px rgba(28, 55, 113, 0.10);
+            border: 1px solid #d6e0f0;
+            transition: all 0.1s;
+        }
+
+        /* header — blue/red accent with reset button next to score */
+        .head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 4px 10px;
+        }
+
+        .head-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .head-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #1a2c4a;
+            margin: 0;
+            background: #e6edf9;
+            padding: 0 24px 0 20px;
+            border-radius: 60px;
+            line-height: 1.3;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #b8cae6;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        .score-badge {
+            background: #1a2c4a;
+            padding: 6px 20px 6px 18px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.3px;
+            border: 1px solid #3b5a8a;
+            box-shadow: 0 2px 0 #0f1d33;
+            font-family: 'Quicksand', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reset-top-btn {
+            background: #eef4fc;
+            border: 1px solid #b8cae6;
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 60px;
+            color: #1a2c4a;
+            cursor: pointer;
+            transition: 0.08s;
+            font-family: 'Quicksand', sans-serif;
+            letter-spacing: 0.2px;
+            box-shadow: 0 2px 0 #b0c0db;
+            white-space: nowrap;
+        }
+
+        .reset-top-btn:active {
+            transform: scale(0.94);
+        }
+
+        /* level pills */
+        .level-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 26px;
+            flex-wrap: wrap;
+        }
+
+        .level-btn {
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 6px 24px;
+            border: 1px solid #b8cae6;
+            border-radius: 60px;
+            background: #eef4fc;
+            color: #1a2c4a;
+            cursor: pointer;
+            transition: 0.12s;
+            font-family: 'Quicksand', sans-serif;
+            letter-spacing: 0.2px;
+            box-shadow: 0 2px 0 #b0c0db;
+        }
+
+        .level-btn.active {
+            background: #1a2c4a;
+            border-color: #1a2c4a;
+            color: white;
+            box-shadow: 0 2px 0 #0f1d33;
+        }
+
+        .level-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* objects */
+        .objects-area {
+            background: #f5f9ff;
+            border-radius: 48px;
+            padding: 18px 10px;
+            margin-bottom: 18px;
+            border: 1px solid #d6e0f0;
+            min-height: 140px;
+        }
+
+        .emoji-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px 14px;
+            align-items: center;
+            min-height: 100px;
+            padding: 6px 0;
+        }
+
+        .object-emoji {
+            font-size: 2.9rem;
+            line-height: 1;
+            display: inline-block;
+            transition: 0.1s;
+        }
+
+        /* choices */
+        .choice-area {
+            margin: 16px 0 20px;
+        }
+
+        .number-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 10px;
+        }
+
+        .num-choice {
+            background: #eef4fc;
+            border: 1px solid #b8cae6;
+            font-size: 1.8rem;
+            font-weight: 400;
+            font-family: 'Farsan', cursive;
+            width: 62px;
+            padding: 8px 0;
+            border-radius: 60px;
+            color: #1a2c4a;
+            cursor: pointer;
+            transition: 0.08s;
+            text-align: center;
+            line-height: 1.2;
+            box-shadow: 0 2px 0 #b0c0db;
+        }
+
+        .num-choice:active {
+            transform: scale(0.93);
+        }
+
+        .num-choice.correct-highlight {
+            background: #c3d9f0;
+            border-color: #3b6cb0;
+            box-shadow: 0 2px 0 #2a4d7a;
+        }
+
+        .num-choice.wrong-highlight {
+            background: #f7d4d0;
+            border-color: #c94f3a;
+            box-shadow: 0 2px 0 #a83d2b;
+        }
+
+        /* POPUP CARD overlay */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(3px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        .popup-overlay.active {
+            display: flex;
+        }
+
+        .popup-card {
+            background: white;
+            border-radius: 60px;
+            padding: 30px 36px 36px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.15);
+            border: 2px solid #b8cae6;
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .popup-card.correct {
+            border-color: #3b6cb0;
+            background: #f0f7ff;
+        }
+
+        .popup-card.wrong {
+            border-color: #c94f3a;
+            background: #fff5f2;
+        }
+
+        .popup-emoji {
+            font-size: 4rem;
+            margin-bottom: 8px;
+        }
+
+        .popup-title {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Quicksand', sans-serif;
+            margin: 6px 0 4px;
+        }
+
+        .popup-title.correct-title {
+            color: #1a5a8a;
+        }
+
+        .popup-title.wrong-title {
+            color: #b84a3a;
+        }
+
+        .popup-message {
+            font-size: 1.2rem;
+            font-weight: 600;
+            font-family: 'Quicksand', sans-serif;
+            color: #2a3a4a;
+            margin: 6px 0 16px;
+        }
+
+        .popup-score {
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Quicksand', sans-serif;
+            color: #1a2c4a;
+            background: #e6edf9;
+            padding: 4px 18px;
+            border-radius: 60px;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .popup-btn {
+            background: #1a2c4a;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: 'Quicksand', sans-serif;
+            padding: 10px 36px;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 3px 0 #0f1d33;
+        }
+
+        .popup-btn:active {
+            transform: scale(0.95);
+        }
+
+        .popup-btn.correct-btn {
+            background: #1a5a8a;
+            box-shadow: 0 3px 0 #0f3d5a;
+        }
+
+        .popup-btn.wrong-btn {
+            background: #b84a3a;
+            box-shadow: 0 3px 0 #7a3328;
+        }
+
+        /* Animations */
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* shake animation for wrong answer on button */
+        @keyframes shakeError {
+            0% { transform: translateX(0) rotate(0deg); }
+            20% { transform: translateX(-10px) rotate(-2deg); }
+            40% { transform: translateX(10px) rotate(2deg); }
+            60% { transform: translateX(-6px) rotate(-1deg); }
+            80% { transform: translateX(6px) rotate(1deg); }
+            100% { transform: translateX(0) rotate(0deg); }
+        }
+
+        .shake-wrong {
+            animation: shakeError 0.35s ease-in-out;
+        }
+
+        .footnote {
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #7c8db0;
+            margin-top: 20px;
+            letter-spacing: 0.3px;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        @media (max-width: 550px) {
+            .game-box { padding: 20px 14px; }
+            .object-emoji { font-size: 2.3rem; }
+            .num-choice { width: 54px; font-size: 1.6rem; padding: 6px 0; }
+            h1 { font-size: 1.4rem; padding: 0 16px 0 14px; }
+            .score-badge { font-size: 0.95rem; padding: 4px 14px; }
+            .reset-top-btn { font-size: 0.8rem; padding: 4px 12px; }
+            .head { gap: 6px; }
+            .popup-card { padding: 24px 20px 28px; }
+            .popup-title { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-box">
+    <!-- header with score and reset button next to it -->
+    <div class="head">
+        <div class="head-left">
+            <!-- <h1>Let's Count!</h1> -->
+        </div>
+        <div class="head-right">
+            <div class="score-badge" id="scoreDisplay">⭐ 0</div>
+            <button class="reset-top-btn" id="resetGameBtn">↻ reset</button>
+        </div>
+    </div>
+
+    <!-- level -->
+    <div class="level-selector">
+        <button class="level-btn" data-range="1-10">1–10</button>
+        <button class="level-btn" data-range="11-20">11–20</button>
+        <button class="level-btn" data-range="1-20">1–20</button>
+    </div>
+
+    <!-- objects -->
+    <div class="objects-area">
+        <div class="emoji-grid" id="emojiGrid"></div>
+    </div>
+
+    <!-- choices - two rows: 1-5 and 6-10 (or dynamic based on level) -->
+    <div class="choice-area">
+        <div class="number-buttons" id="numberChoicesContainer"></div>
+    </div>
+
+    <!-- POPUP CARD -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-card" id="popupCard">
+            <div class="popup-emoji" id="popupEmoji">🎉</div>
+            <div class="popup-title" id="popupTitle">Correct!</div>
+            <div class="popup-message" id="popupMessage">You got it!</div>
+            <div class="popup-score" id="popupScore">⭐ Score: 0</div>
+            <button class="popup-btn" id="popupBtn">Continue</button>
+        </div>
+    </div>
+
+    <div class="footnote">· count the emojis ·</div>
+</div>
+
+<script>
+    (function(){
+        // ---- state ----
+        let currentLevel = "1-10";
+        let currentMin = 1;
+        let currentMax = 10;
+        let currentNumber = 5;
+        let score = 0;
+        let answered = false;
+        let currentEmoji = "🐘";
+
+        const emojiPool = ["🐘","🐱","🐶","🐼","🦊","🐨","🐯","🐸","🐵","🐧","🐥","🐌","🐞","🍎","🍕","⭐","🌈","🌸","⚽","🚗","🎈","🧸","🍦","🐬","🦄","🐻","🐹","🐰","🐙","🍭"];
+
+        const emojiGrid = document.getElementById("emojiGrid");
+        const numberChoicesContainer = document.getElementById("numberChoicesContainer");
+        const scoreDisplay = document.getElementById("scoreDisplay");
+        const resetBtn = document.getElementById("resetGameBtn");
+        const levelBtns = document.querySelectorAll(".level-btn");
+
+        // Popup elements
+        const popupOverlay = document.getElementById("popupOverlay");
+        const popupCard = document.getElementById("popupCard");
+        const popupEmoji = document.getElementById("popupEmoji");
+        const popupTitle = document.getElementById("popupTitle");
+        const popupMessage = document.getElementById("popupMessage");
+        const popupScore = document.getElementById("popupScore");
+        const popupBtn = document.getElementById("popupBtn");
+
+        // helpers
+        function randomEmoji() {
+            return emojiPool[Math.floor(Math.random() * emojiPool.length)];
+        }
+
+        function updateRange() {
+            if (currentLevel === "1-10") { currentMin = 1; currentMax = 10; }
+            else if (currentLevel === "11-20") { currentMin = 11; currentMax = 20; }
+            else { currentMin = 1; currentMax = 20; }
+        }
+
+        function randomNumber() {
+            return Math.floor(Math.random() * (currentMax - currentMin + 1)) + currentMin;
+        }
+
+        // render emojis
+        function renderEmojis() {
+            emojiGrid.innerHTML = "";
+            const total = currentNumber;
+            if (total === 0) return;
+            for (let i = 0; i < total; i++) {
+                const span = document.createElement("span");
+                span.className = "object-emoji";
+                span.textContent = currentEmoji;
+                const rot = (Math.random() * 6 - 3).toFixed(1);
+                span.style.transform = `rotate(${rot}deg)`;
+                emojiGrid.appendChild(span);
+            }
+        }
+
+        // generate number buttons in two rows
+        function renderChoices() {
+            numberChoicesContainer.innerHTML = "";
+            
+            const numbers = [];
+            for (let n = currentMin; n <= currentMax; n++) {
+                numbers.push(n);
+            }
+            
+            const mid = Math.ceil(numbers.length / 2);
+            const firstRow = numbers.slice(0, mid);
+            const secondRow = numbers.slice(mid);
+            
+            const row1 = document.createElement("div");
+            row1.style.cssText = "display:flex; flex-wrap:wrap; justify-content:center; gap:8px 10px; width:100%; margin-bottom:8px;";
+            firstRow.forEach(n => {
+                const btn = createNumberButton(n);
+                row1.appendChild(btn);
+            });
+            numberChoicesContainer.appendChild(row1);
+            
+            if (secondRow.length > 0) {
+                const row2 = document.createElement("div");
+                row2.style.cssText = "display:flex; flex-wrap:wrap; justify-content:center; gap:8px 10px; width:100%;";
+                secondRow.forEach(n => {
+                    const btn = createNumberButton(n);
+                    row2.appendChild(btn);
+                });
+                numberChoicesContainer.appendChild(row2);
+            }
+        }
+
+        function createNumberButton(n) {
+            const btn = document.createElement("button");
+            btn.className = "num-choice";
+            btn.textContent = n;
+            btn.dataset.value = n;
+            btn.addEventListener("click", function(e) {
+                if (answered) return;
+                const chosen = parseInt(this.dataset.value);
+                handleChoice(chosen, this);
+            });
+            return btn;
+        }
+
+        // Show popup
+        function showPopup(isCorrect) {
+            popupOverlay.classList.add("active");
+
+            if (isCorrect) {
+                popupCard.className = "popup-card correct";
+                popupEmoji.textContent = "🎉";
+                popupTitle.className = "popup-title correct-title";
+                popupTitle.textContent = "Correct! 🌟";
+                popupMessage.textContent = `You counted ${currentNumber} ${currentEmoji} objects!`;
+                popupBtn.className = "popup-btn correct-btn";
+                popupBtn.textContent = "Yay! Continue";
+            } else {
+                popupCard.className = "popup-card wrong";
+                popupEmoji.textContent = "😅";
+                popupTitle.className = "popup-title wrong-title";
+                popupTitle.textContent = "Oops!";
+                popupMessage.textContent = `That's not right. Try again!`;
+                popupBtn.className = "popup-btn wrong-btn";
+                popupBtn.textContent = "Try Again";
+            }
+
+            popupScore.textContent = `⭐ Score: ${score}`;
+        }
+
+        // handle guess
+        function handleChoice(chosen, btnElement) {
+            if (answered) return;
+            const correct = chosen === currentNumber;
+
+            if (correct) {
+                score++;
+                updateScore();
+                btnElement.classList.add("correct-highlight");
+                answered = true;
+
+                document.querySelectorAll(".object-emoji").forEach(el => {
+                    el.style.transform = "scale(1.12) rotate(0deg)";
+                    setTimeout(() => el.style.transform = "", 250);
+                });
+
+                document.querySelectorAll(".num-choice").forEach(b => {
+                    if (b !== btnElement) b.style.opacity = "0.5";
+                });
+
+                showPopup(true);
+
+            } else {
+                btnElement.classList.add("shake-wrong");
+                btnElement.classList.add("wrong-highlight");
+
+                setTimeout(() => {
+                    showPopup(false);
+                }, 200);
+
+                setTimeout(() => {
+                    btnElement.classList.remove("shake-wrong");
+                }, 400);
+
+                setTimeout(() => {
+                    if (btnElement) btnElement.classList.remove("wrong-highlight");
+                }, 500);
+            }
+        }
+
+        // Reset answered state
+        function resetAnsweredState() {
+            answered = false;
+            document.querySelectorAll(".num-choice").forEach(b => {
+                b.classList.remove("correct-highlight", "wrong-highlight");
+                b.style.opacity = "1";
+                b.style.background = "";
+            });
+            emojiGrid.style.background = "";
+        }
+
+        // Load next object (auto-advance after correct)
+        function loadNextObject() {
+            currentNumber = randomNumber();
+            currentEmoji = randomEmoji();
+            renderEmojis();
+            resetAnsweredState();
+        }
+
+        // Reset game
+        function resetGame() {
+            score = 0;
+            updateScore();
+            currentNumber = randomNumber();
+            currentEmoji = randomEmoji();
+            renderEmojis();
+            resetAnsweredState();
+            popupOverlay.classList.remove("active");
+        }
+
+        // change level
+        function changeLevel(level) {
+            if (level === currentLevel) {
+                resetGame();
+                return;
+            }
+            currentLevel = level;
+            updateRange();
+            score = 0;
+            updateScore();
+            currentNumber = randomNumber();
+            currentEmoji = randomEmoji();
+            renderChoices();
+            renderEmojis();
+            resetAnsweredState();
+            popupOverlay.classList.remove("active");
+            levelBtns.forEach(b => {
+                b.classList.remove("active");
+                if (b.dataset.range === currentLevel) b.classList.add("active");
+            });
+        }
+
+        function updateScore() {
+            scoreDisplay.textContent = `⭐ ${score}`;
+        }
+
+        // ---- Popup button handler ----
+        popupBtn.addEventListener("click", function() {
+            const wasCorrect = popupCard.classList.contains("correct");
+            popupOverlay.classList.remove("active");
+
+            if (wasCorrect) {
+                loadNextObject();
+            } else {
+                document.querySelectorAll(".num-choice").forEach(b => {
+                    b.style.opacity = "1";
+                    b.classList.remove("wrong-highlight");
+                });
+                answered = false;
+            }
+        });
+
+        // init
+        function init() {
+            currentLevel = "1-10";
+            updateRange();
+            score = 0;
+            updateScore();
+            currentNumber = randomNumber();
+            currentEmoji = randomEmoji();
+            renderChoices();
+            renderEmojis();
+            resetAnsweredState();
+            popupOverlay.classList.remove("active");
+            levelBtns.forEach(b => {
+                b.classList.remove("active");
+                if (b.dataset.range === currentLevel) b.classList.add("active");
+            });
+        }
+
+        // ---- event listeners ----
+        resetBtn.addEventListener("click", function() {
+            popupOverlay.classList.remove("active");
+            resetGame();
+        });
+
+        levelBtns.forEach(btn => {
+            btn.addEventListener("click", function() {
+                const range = this.dataset.range;
+                popupOverlay.classList.remove("active");
+                if (range === currentLevel) {
+                    resetGame();
+                    return;
+                }
+                changeLevel(range);
+            });
+        });
+
+        // click on emoji grid — subtle hint
+        emojiGrid.addEventListener("click", function() {
+            if (!answered && !popupOverlay.classList.contains("active")) {
+                // subtle hint
+            }
+        });
+
+        init();
+    })();
+</script>
+</body>
+</html>
